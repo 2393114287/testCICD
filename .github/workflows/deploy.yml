@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4. CI环节：代码检查 + 打包构建
+      # 4. CI环节：代码检查 + 打包构建1
       - name: Lint & Build
         run: |
           npm run lint
