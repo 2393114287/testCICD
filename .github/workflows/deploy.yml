@@ -1,38 +1,40 @@
 name: Vue CI&CD
 
-# 触发时机：main分支有代码推送时执行流水线
+# 触发时机：main分支推送 + 页面手动运行流水线
 on:
   push:
     branches: [ main ]
+  workflow_dispatch: # 支持网页手动点击运行
 
 jobs:
   build-deploy:
-    runs-on: ubuntu-latest  # 运行环境：ubuntu系统虚拟机
+    runs-on: ubuntu-latest
     steps:
-      # 1. 拉取当前仓库代码
+      # 1. 拉取仓库代码，升级v5消除Node版本警告
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      # 2. 配置node环境
+      # 2. 配置Node18环境，完善npm缓存配置
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm' # 缓存依赖，加快下次打包速度
+          cache: 'npm'
+          cache-dependency-path: package-lock.json # 锁定缓存文件
 
-      # 3. 安装依赖
+      # 3. 安装项目依赖
       - name: Install dependencies
         run: npm install
 
-      # 4. CI环节：代码检查 + 打包构建1
+      # 4. 代码校验 + 打包生成dist静态资源
       - name: Lint & Build
         run: |
           npm run lint
           npm run build
 
-      # 5. CD环节：把dist部署到GitHub Pages
+      # 5. 部署dist目录到gh-pages分支，供给GitHub Pages读取
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./dist # 打包产物目录
