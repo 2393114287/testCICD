@@ -38,3 +38,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist # 打包产物目录
+          force_orphan: true
+          commit_message: "deploy ${{ github.sha }} [skip ci]"
